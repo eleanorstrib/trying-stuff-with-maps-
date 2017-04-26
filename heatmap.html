@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+  <head>
+    <title></title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+    <link rel="stylesheet" href="style/lstyle.css" />
+  </head>
+
+  <body>
+    <div id="mapid"></div>
+     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+     <script type="text/javascript" src="./libraries/leaflet_heat.js"></script>
+     <script type="text/javascript" src="./secret.js"></script>
+     <script>
+
+      var map = L.map('mapid').setView([36.7783, -119.4179], 6);
+      L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token=' + mapboxToken, {
+          attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+          maxZoom: 18,
+          id: 'your.mapbox.project.id',
+          accessToken: mapboxToken,
+        }).addTo(map);
+
+        $.getJSON("ca_solar.geojson", function(data){
+          var heatmap_array =[];
+          $.each(data, function(key, val){
+            if (typeof(val) == 'object'){
+              for (i = 0; i < val.length; i++){
+                var coordinates = val[i]["geometry"]["coordinates"];
+                heatmap_array.push([coordinates[1], coordinates[0], 0.2]);
+              }
+            }
+          })
+          console.log(heatmap_array);
+          var heat = L.heatLayer(heatmap_array, {radius: 20, blur: 5, gradient: {0.1: 'black', 0.2: 'green', 0.3: 'cyan', 0.4: 'blue', 0.5: 'yellow', 0.6:'orange', 1.0: 'red'}}).addTo(map);
+        });
+
+     </script>
+  </body>
+</html>
